@@ -1,9 +1,9 @@
 section .data
-  global C_table
-  C_table resq 1
+  global C_matrix
+  C_matrix resq 1
 
 section .text
-  global print_table
+  global print_matrix
 
 ; Externs
 

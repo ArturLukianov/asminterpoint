@@ -7,7 +7,7 @@ section .text
 	global print_float
 	global print_int
 	global putchar
-	global print_table
+	global print_matrix
 
 extern strlen
 extern malloc
@@ -253,8 +253,8 @@ putchar:
 	ret
 
 
-; void print_table(table*:rax)
-print_table:
+; void print_matrix(matrix*:rax)
+print_matrix:
   prologue
 
   mov  rax, QWORD [rax]

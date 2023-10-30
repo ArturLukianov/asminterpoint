@@ -11,12 +11,12 @@ section .text
 ; Externs
 ;  print.S
 extern print
-extern print_table
+extern print_matrix
 ;  input.S
 extern read_int
-;  table.S
-extern C_table
-extern create_table
+;  matrix.S
+extern C_matrix
+extern create_matrix
 
 ; Macros
 %macro print 1
@@ -35,9 +35,9 @@ _start:
 
   add  rax, rbx
   mov  rbx, 1
-  call create_table
-  mov  QWORD [C_table], rax
-  call print_table
+  call create_matrix
+  mov  QWORD [C_matrix], rax
+  call print_matrix
 
 exit:
 	mov rax, 60

@@ -1,5 +1,5 @@
 section .text
-  global create_table
+  global create_matrix
 
 ; Externs
 ;  memory.S
@@ -17,15 +17,15 @@ extern malloc
 %endmacro
 
 
-; table* create_table(uint64_t width: rax, uint64_t height:rbx):rax
-; Initializes a table of size width x height on heap
+; matrix* create_matrix(uint64_t width: rax, uint64_t height:rbx):rax
+; Initializes a matrix of size width x height on heap
 ; Table structure:
 ;   uint64 width
 ;   uint64 height
 ;   float  data[width][height] -> {row_0}{row_1}...
 ; Uses malloc
 ; SIZE EQUAL TO ZERO NOT SUPPORTED
-create_table:
+create_matrix:
   prologue
 
   ; size = 8 + 8 + width * height
@@ -41,11 +41,11 @@ create_table:
   add rax, 0x10
   imul rbx, rcx
   xor rcx, rcx
-  create_table_loop:
+  create_matrix_loop:
     mov QWORD [rax+rcx*8], 0
     inc rcx
     cmp rcx, rbx
-    jl  create_table_loop
+    jl  create_matrix_loop
   sub rax, 0x10
 
   epilogue
