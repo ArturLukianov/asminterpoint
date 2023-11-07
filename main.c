@@ -102,7 +102,23 @@ Matrix subtractMatrices(Matrix *m1, Matrix *m2)
   Matrix result = createMatrix(m1->rows, m1->cols);
   for (int i = 0; i < m1->rows; i++)
   {
-    result.data[i] = m2->data[i] - m2->data[i];
+    for (int j = 0; j < m1->rows; j++)
+    {
+      result.data[i][j] = m1->data[i][j] - m2->data[i][j];
+    }
+  }
+  return result;
+}
+
+Matrix addMatrices(Matrix *m1, Matrix *m2)
+{
+  Matrix result = createMatrix(m1->rows, m1->cols);
+  for (int i = 0; i < m1->rows; i++)
+  {
+    for (int j = 0; j < m1->rows; j++)
+    {
+      result.data[i][j] = m1->data[i][j] + m2->data[i][j];
+    }
   }
   return result;
 }
@@ -241,6 +257,67 @@ Matrix scalarDivideMatrix(Matrix *m, double scalar)
   return result;
 }
 
+double matrixNorm(Matrix m)
+{
+  double norm = 0.0;
+  for (int i = 0; i < m.rows; i++)
+  {
+    for (int j = 0; j < m.cols; j++)
+    {
+      norm += m.data[i][j] * m.data[i][j];
+    }
+  }
+  return sqrt(norm);
+}
+
+Matrix copyMatrix(Matrix *source)
+{
+  Matrix copy = createMatrix(source->rows, source->cols);
+  for (int i = 0; i < source->rows; i++)
+  {
+    for (int j = 0; j < source->cols; j++)
+    {
+      copy.data[i][j] = source->data[i][j];
+    }
+  }
+  return copy;
+}
+
+void printMatrix(Matrix *m)
+{
+  for (int i = 0; i < m->rows; i++)
+  {
+    for (int j = 0; j < m->cols; j++)
+    {
+      printf("%f ", m->data[i][j]);
+    }
+    printf("\n");
+  }
+}
+
+double absoluteMin(Matrix *m)
+{
+  if (m->rows == 0 || m->cols == 0)
+    return 0; // Return 0 if the matrix has no elements
+
+  // Start with the first element as the minimum
+  double min = fabs(m->data[0][0]);
+
+  for (int i = 0; i < m->rows; i++)
+  {
+    for (int j = 0; j < m->cols; j++)
+    {
+      double absValue = fabs(m->data[i][j]);
+      if (absValue < min)
+      {
+        min = absValue;
+      }
+    }
+  }
+
+  return min;
+}
+
 int main()
 {
   int n, m;
@@ -252,29 +329,25 @@ int main()
   scanf("%d", &m);
 
   // Allocate memory for the coefficients of the objective function (C)
-  double *C = (double *)malloc(n * sizeof(double));
-
   printf("Enter the coefficients of the objective function (C):\n");
-  for (int i = 0; i < n; i++)
-  {
-    scanf("%lf", &C[i]);
-  }
+  // for (int i = 0; i < n; i++)
+  // {
+  //   scanf("%lf", &C[i]);
+  // }
 
-  // Allocate memory for the coefficients of constraint function (A)
-  double **A = (double **)malloc(m * sizeof(double *));
-  for (int i = 0; i < m; i++)
-  {
-    A[i] = (double *)malloc(n * sizeof(double));
-  }
+  // for (int i = 0; i < m; i++)
+  // {
+  //   A[i] = (double *)malloc(n * sizeof(double));
+  // }
 
   printf("Enter the coefficients of the constraint function (A):\n");
-  for (int i = 0; i < m; i++)
-  {
-    for (int j = 0; j < n; j++)
-    {
-      scanf("%lf", &A[i][j]);
-    }
-  }
+  // for (int i = 0; i < m; i++)
+  // {
+  //   for (int j = 0; j < n; j++)
+  //   {
+  //     scanf("%lf", &A[i][j]);
+  //   }
+  // }
 
   // Allocate memory for the right-hand side numbers (b)
   double *b = (double *)malloc(m * sizeof(double));
@@ -289,17 +362,6 @@ int main()
 
   printf("Enter the approximation accuracy (epsilon): ");
   scanf("%lf", &epsilon);
-
-  double alpha = 0.5; // Set alpha to 0.5 by default
-
-  printf("Choose alpha (0.5 or 0.9): ");
-  scanf("%lf", &alpha);
-
-  if (alpha != 0.5 && alpha != 0.9)
-  {
-    printf("Invalid choice for alpha. Please choose 0.5 or 0.9.\n");
-    return 1;
-  }
 
   int maxIterations = 10000; // Maximum number of iterations
 
@@ -328,8 +390,10 @@ int main()
     P = subtractMatrices(&I, &HAA); // P = I - H * AA
     cp = multiplyMatrices(&P, &cc); // cp = P * cc
 
-    nu = absoluteMin(&cp);                                                          // Function to find the absolute minimum value in cp
-    Matrix y = scalarDivideMatrix(addMatrices(identityMatrix(n), &cp), alpha / nu); // y = 1 + (alpha / nu) * cp
+    nu = absoluteMin(&cp); // Function to find the absolute minimum value in cp
+    // Matrix I = identityMatrix(n);
+    Matrix IC = addMatrices(&I, &cp);
+    Matrix y = scalarDivideMatrix(&IC, alpha / nu); // y = 1 + (alpha / nu) * cp
 
     Matrix yy = multiplyMatrices(&D, &y); // yy = D * y
 
@@ -340,7 +404,7 @@ int main()
     }
 
     // Update x for the next iteration
-    copyMatrix(&x, &yy);
+    Matrix x = copyMatrix(&yy);
 
     iteration++;
 
@@ -364,10 +428,10 @@ int main()
   freeMatrix(&D);
 
   // Free dynamically allocated memory
-  free(C);
+  free(&C);
   for (int i = 0; i < m; i++)
   {
-    free(A[i]);
+    free(A.data[i]);
   }
   return 0;
 }
