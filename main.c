@@ -54,7 +54,7 @@ int main()
   for (int i = 0; i < m; i++)
   {
     scanf("%lf", &b[i]);
-  } 
+  }
 
   double epsilon;
 
@@ -76,7 +76,7 @@ int main()
 
   // Allocate memory for decision variables (x)
   double *x = (double *)malloc(n * sizeof(double));
-  
+
   // Free dynamically allocated memory
   free(C);
   for (int i = 0; i < m; i++)
