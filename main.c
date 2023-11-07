@@ -58,13 +58,13 @@ void freeVector(Vector v)
   free(v.data);
 }
 
-void freeMatrix(Matrix m)
+void freeMatrix(Matrix *m)
 {
-  for (int i = 0; i < m.rows; i++)
+  for (int i = 0; i < m->rows; i++)
   {
-    free(m.data[i]);
+    free(m->data[i]);
   }
-  free(m.data);
+  free(m->data);
 }
 
 Vector scalarMultiplyVector(double scalar, Vector v)
@@ -186,7 +186,7 @@ Matrix invertMatrix(Matrix *m)
     if (fabs(pivot) < 1e-10)
     {
       printf("Error: matrix is singular and cannot be inverted.\n");
-      freeMatrix(augmented);
+      freeMatrix(&augmented);
       exit(-1);
     }
 
@@ -217,7 +217,7 @@ Matrix invertMatrix(Matrix *m)
     }
   }
 
-  freeMatrix(augmented);
+  freeMatrix(&augmented);
 
   return result;
 }
@@ -345,24 +345,23 @@ int main()
     iteration++;
 
     // Free temporary matrices
-    freeMatrix(AA);
-    freeMatrix(cc);
-    freeMatrix(ATA);
-    freeMatrix(ATAI);
-    freeMatrix(H);
-    freeMatrix(P);
-    freeMatrix(cp);
-    freeMatrix(y);
-    freeMatrix(yy);
+    freeMatrix(&AA);
+    freeMatrix(&cc);
+    freeMatrix(&ATA);
+    freeMatrix(&ATAI);
+    freeMatrix(&H);
+    freeMatrix(&P);
+    freeMatrix(&cp);
+    freeMatrix(&yy);
   }
 
   printMatrix(&x); // Print the final result
 
   // Free all matrices
   freeVector(x);
-  // freeMatrix(A);
-  // freeMatrix(C);
-  // freeMatrix(D);
+  freeMatrix(&A);
+  freeMatrix(&C);
+  freeMatrix(&D);
 
   // Free dynamically allocated memory
   free(C);
@@ -370,9 +369,5 @@ int main()
   {
     free(A[i]);
   }
-  free(A);
-  free(b);
-  frfreeVectoree(x);
-
   return 0;
 }
